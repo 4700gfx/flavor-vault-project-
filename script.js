@@ -54,7 +54,11 @@ document.addEventListener('DOMContentLoaded', () => {
 			this.recipes = [...this.recipes, recipe];
 			return recipe;
 		},
-		remove(id) {},
+		remove(id) {
+			const originalLength = this.recipes.length;
+			this.recipes = this.recipes.filter((recipe) => recipe.id != id);
+			return originalLength > this.recipes.length;
+		},
 		findByIngredient(ingredient) {}
 	};
 
@@ -70,6 +74,9 @@ document.addEventListener('DOMContentLoaded', () => {
 	// 5. EVENT LISTENERS
 	//    document.getElementById('recipe-form').addEventListener('submit', ...);
 	//    document.getElementById('search-input').addEventListener('input', ...);
+
+	//TESTS
+
 	console.log(recipeBook);
 	recipeBook.add({
 		name: 'Test',
@@ -77,4 +84,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		tags: new Set(),
 		prepTime: 5
 	});
+
+	// const realId = recipeBook.recipes[0].id;
+	// console.log(recipeBook.remove(realId));
+	// console.log(recipeBook.recipes);
 });

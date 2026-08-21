@@ -1,0 +1,2299 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Flavor Vault</title>
+
+		<!-- Tailwind CDN (Play CDN — no build step) -->
+		<script src="https://cdn.tailwindcss.com"></script>
+		<script>
+			tailwind.config = {
+				theme: {
+					extend: {
+						colors: {
+							accent: {
+								DEFAULT: '#ec3013',
+								100: '#fff2ef',
+								200: '#ffe0d9',
+								300: '#ffc4b8',
+								400: '#ff9783',
+								500: '#ff563c',
+								600: '#dd2b0f',
+								700: '#ae1800',
+								800: '#7c1405',
+								900: '#4d170e'
+							},
+							neutral: {
+								100: '#f8f4f4',
+								200: '#eae7e7',
+								300: '#d7d3d3',
+								400: '#bab6b6',
+								500: '#9b9797',
+								600: '#7d7979',
+								700: '#605d5d',
+								800: '#444141',
+								900: '#2d2b2b'
+							}
+						},
+						fontFamily: {
+							sans: ['Archivo', 'system-ui', 'sans-serif']
+						}
+					}
+				}
+			};
+		</script>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&display=swap"
+			rel="stylesheet"
+		/>
+
+		<style>
+			/* Archivo is a variable font; this keeps headings visually bold like the mockup
+     without needing a Tailwind font-weight-900 utility everywhere. */
+			h1,
+			h2,
+			h3,
+			h4 {
+				font-weight: 800;
+				letter-spacing: -0.015em;
+			}
+		</style>
+	</head>
+
+	<body
+		class="bg-neutral-100 text-neutral-900 font-sans text-[15px] leading-[1.55]"
+	>
+		<!-- ============================================================
+     NAV — always visible. data-nav / fvGo() are presentational
+     (which screen shows), carried over from the original mockup.
+     ============================================================ -->
+		<nav
+			class="flex items-center gap-4 px-4 py-3 border-b-2 border-neutral-900/10 bg-neutral-100"
+		>
+			<span
+				class="mr-auto inline-flex items-center gap-2 text-lg font-extrabold"
+			>
+				<svg
+					width="16"
+					height="16"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="#ec3013"
+					stroke-width="2.4"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path>
+					<path d="M7 2v20"></path>
+					<path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Z"></path>
+					<path d="M21 15v7"></path>
+				</svg>
+				Flavor Vault
+			</span>
+			<a
+				href="#"
+				data-nav="recipes"
+				onclick="
+					fvGo('recipes');
+					return false;
+				"
+				class="text-sm text-accent hover:text-accent"
+				>Recipes</a
+			>
+			<a
+				href="#"
+				data-nav="add"
+				onclick="
+					fvGo('add');
+					return false;
+				"
+				class="text-sm text-neutral-900 hover:text-accent"
+				>Add recipe</a
+			>
+			<a
+				href="#"
+				data-nav="pantry"
+				onclick="
+					fvGo('pantry');
+					return false;
+				"
+				class="text-sm text-neutral-900 hover:text-accent"
+				>My pantry</a
+			>
+			<a
+				href="#"
+				data-nav="shopping"
+				onclick="
+					fvGo('shopping');
+					return false;
+				"
+				class="text-sm text-neutral-900 hover:text-accent"
+				>Shopping list</a
+			>
+			<button
+				type="button"
+				id="nav-new-recipe-btn"
+				onclick="
+					fvGo('add');
+					return false;
+				"
+				class="inline-flex items-center gap-1.5 bg-accent hover:bg-accent-600 active:bg-accent-700 text-white font-extrabold text-sm rounded-xl px-4 py-2"
+			>
+				New recipe
+				<svg
+					width="14"
+					height="14"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<path d="M5 12h14"></path>
+					<path d="M12 5v14"></path>
+				</svg>
+			</button>
+		</nav>
+
+		<!-- ============================================================
+     SCREEN: RECIPES
+     ============================================================ -->
+		<div class="fv-screen" data-screen="recipes">
+			<main class="max-w-[1280px] w-full mx-auto px-6 pt-6 pb-8">
+				<header class="flex items-end justify-between gap-4 mb-4">
+					<div>
+						<div
+							id="recipe-count-label"
+							class="text-[13px] tracking-wide uppercase text-accent-700 mb-1"
+						>
+							Recipe box · 6 recipes
+						</div>
+						<h1 class="text-[42px] leading-[1.12] m-0">Recipes</h1>
+					</div>
+					<div
+						id="pantry-ready-summary"
+						class="flex items-center gap-2 text-[13px] text-neutral-700"
+					>
+						<span class="inline-block w-2 h-2 rounded-full bg-accent"></span>
+						<span id="pantry-ready-count">3</span>&nbsp;ready from your pantry
+					</div>
+				</header>
+
+				<div
+					class="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6 items-start"
+				>
+					<section>
+						<!-- Search + sort -->
+						<div
+							class="flex flex-col sm:flex-row gap-3 sm:items-center border-t-2 border-b-2 border-neutral-900/10 py-3 mb-4"
+						>
+							<div class="relative flex-1">
+								<svg
+									width="15"
+									height="15"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="absolute left-3 top-1/2 -translate-y-1/2 opacity-50 pointer-events-none"
+								>
+									<circle cx="11" cy="11" r="8"></circle>
+									<path d="m21 21-4.3-4.3"></path>
+								</svg>
+								<input
+									id="search-input"
+									type="text"
+									placeholder="Search by ingredient or tag…"
+									class="w-full pl-9 pr-3 min-h-9 text-sm bg-neutral-200 border border-neutral-900/10 rounded-xl focus:border-accent focus:outline-none"
+								/>
+							</div>
+							<div
+								id="sort-control"
+								role="radiogroup"
+								aria-label="Sort"
+								class="inline-flex overflow-hidden border border-neutral-900/10 rounded-xl shrink-0"
+							>
+								<label
+									class="has-[:checked]:bg-accent has-[:checked]:text-white inline-flex items-center gap-1.5 px-3 py-1.5 text-[13px] cursor-pointer"
+								>
+									<input
+										type="radio"
+										name="fv-sort"
+										value="newest"
+										checked
+										class="sr-only"
+									/>Newest
+								</label>
+								<label
+									class="has-[:checked]:bg-accent has-[:checked]:text-white inline-flex items-center gap-1.5 px-3 py-1.5 text-[13px] cursor-pointer border-l border-neutral-900/10"
+								>
+									<input
+										type="radio"
+										name="fv-sort"
+										value="prep"
+										class="sr-only"
+									/>Prep time
+								</label>
+								<label
+									class="has-[:checked]:bg-accent has-[:checked]:text-white inline-flex items-center gap-1.5 px-3 py-1.5 text-[13px] cursor-pointer border-l border-neutral-900/10"
+								>
+									<input
+										type="radio"
+										name="fv-sort"
+										value="az"
+										class="sr-only"
+									/>A–Z
+								</label>
+							</div>
+						</div>
+
+						<!-- Tag cloud -->
+						<div id="tag-cloud" class="flex gap-2 items-center flex-wrap mb-4">
+							<span
+								class="text-[11px] tracking-wide uppercase text-neutral-600 mr-1"
+								>Tags</span
+							>
+							<!-- Each pill: class="tag-filter-btn", data-tag="<tag>". Toggle bg-accent-100/text-accent-800 (active)
+             vs border border-accent text-accent (inactive) from JS. Counts are static here; recompute in JS. -->
+							<button
+								type="button"
+								class="tag-filter-btn cursor-pointer text-[11px] rounded-full px-2.5 py-1 bg-accent-100 text-accent-800"
+								data-tag="quick"
+							>
+								quick · 4
+							</button>
+							<button
+								type="button"
+								class="tag-filter-btn cursor-pointer text-[11px] rounded-full px-2.5 py-1 border border-accent text-accent"
+								data-tag="vegetarian"
+							>
+								vegetarian · 3
+							</button>
+							<button
+								type="button"
+								class="tag-filter-btn cursor-pointer text-[11px] rounded-full px-2.5 py-1 border border-accent text-accent"
+								data-tag="dinner"
+							>
+								dinner · 3
+							</button>
+							<button
+								type="button"
+								class="tag-filter-btn cursor-pointer text-[11px] rounded-full px-2.5 py-1 border border-accent text-accent"
+								data-tag="spicy"
+							>
+								spicy · 2
+							</button>
+							<button
+								type="button"
+								class="tag-filter-btn cursor-pointer text-[11px] rounded-full px-2.5 py-1 border border-accent text-accent"
+								data-tag="comfort"
+							>
+								comfort · 2
+							</button>
+							<button
+								type="button"
+								class="tag-filter-btn cursor-pointer text-[11px] rounded-full px-2.5 py-1 border border-accent text-accent"
+								data-tag="breakfast"
+							>
+								breakfast · 1
+							</button>
+							<button
+								type="button"
+								id="clear-filters-btn"
+								class="ml-auto text-accent hover:bg-accent/10 font-extrabold text-sm rounded-xl px-2 py-2"
+							>
+								Clear
+							</button>
+						</div>
+
+						<!-- Recipe card grid — rendered dynamically in JS from the recipes array.
+           These 6 cards are Phase-1 static markup only: fake data matching the
+           mockup, one .recipe-card article per recipe, each carrying data-recipe-id. -->
+						<div id="recipe-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<!-- Card: Garlic Butter Pasta (pantry ready, favorited) -->
+							<article
+								class="recipe-card bg-neutral-200 rounded-2xl p-3 flex flex-col gap-2 border-t-[3px] border-accent"
+								data-recipe-id="1"
+							>
+								<div class="flex gap-3 items-center mb-1">
+									<div
+										class="w-[42px] h-[42px] rounded-xl bg-accent-100 flex items-center justify-center shrink-0"
+									>
+										<svg
+											width="20"
+											height="20"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="#ae1800"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path
+												d="m16 2-2.3 2.3a3 3 0 0 0 0 4.2l1.8 1.8a3 3 0 0 0 4.2 0L22 8"
+											></path>
+											<path
+												d="M15 15 3.3 3.3a4.2 4.2 0 0 0 0 6l7.3 7.3c.7.7 2 .7 2.8 0L15 15Zm0 0 7 7"
+											></path>
+											<path d="m2.1 21.8 6.4-6.3"></path>
+											<path d="m19 5-7 7"></path>
+										</svg>
+									</div>
+									<div class="flex-1 min-w-0">
+										<a
+											href="#"
+											onclick="
+												fvGo('detail');
+												return false;
+											"
+											class="no-underline text-inherit"
+										>
+											<div
+												class="recipe-card-title font-extrabold text-[17px] leading-tight"
+											>
+												Garlic Butter Pasta
+											</div>
+										</a>
+										<div class="recipe-card-meta text-xs text-neutral-600">
+											4 ingredients · 20 min
+										</div>
+									</div>
+									<button
+										type="button"
+										class="favorite-toggle"
+										data-recipe-id="1"
+										aria-label="Favorite"
+										data-favorited="true"
+									>
+										<svg
+											width="17"
+											height="17"
+											viewBox="0 0 24 24"
+											fill="#ec3013"
+											stroke="#ec3013"
+											stroke-width="2"
+											stroke-linejoin="round"
+										>
+											<path
+												d="M11.5 2.5 14 8l6 .8-4.4 4.2 1 5.9-5.1-2.7-5.1 2.7 1-5.9L3 8.8 9 8z"
+											></path>
+										</svg>
+									</button>
+								</div>
+								<div
+									class="recipe-card-status flex items-center gap-1.5 text-xs text-accent-700 font-semibold"
+									data-status="ready"
+								>
+									<svg
+										width="13"
+										height="13"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2.4"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M20 6 9 17l-5-5"></path>
+									</svg>
+									Pantry ready — you have everything
+								</div>
+								<div
+									class="recipe-card-ingredients text-[13px] text-neutral-700"
+								>
+									pasta · garlic · butter · parmesan
+								</div>
+								<div class="flex gap-1 flex-wrap items-center">
+									<span
+										class="tag-pill text-[11px] rounded-full px-2.5 py-0.5 bg-accent-100 text-accent-800"
+										>quick</span
+									>
+									<span
+										class="tag-pill text-[11px] rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+										>vegetarian</span
+									>
+									<button
+										type="button"
+										class="delete-recipe-btn ml-auto text-neutral-600 hover:text-accent hover:bg-accent/10 rounded-lg p-1.5"
+										data-recipe-id="1"
+										aria-label="Delete recipe"
+									>
+										<svg
+											width="15"
+											height="15"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path d="M3 6h18"></path>
+											<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+											<path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+										</svg>
+									</button>
+								</div>
+							</article>
+
+							<!-- Card: Shakshuka (pantry ready) -->
+							<article
+								class="recipe-card bg-neutral-200 rounded-2xl p-3 flex flex-col gap-2 border-t-[3px] border-accent"
+								data-recipe-id="2"
+							>
+								<div class="flex gap-3 items-center mb-1">
+									<div
+										class="w-[42px] h-[42px] rounded-xl bg-accent-100 flex items-center justify-center shrink-0"
+									>
+										<svg
+											width="20"
+											height="20"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="#ae1800"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path
+												d="M12 22c6.23-.05 7.87-5.57 7.5-10-.36-4.34-3.95-9.96-7.5-10-3.55.04-7.14 5.66-7.5 10-.37 4.43 1.27 9.95 7.5 10z"
+											></path>
+										</svg>
+									</div>
+									<div class="flex-1 min-w-0">
+										<div
+											class="recipe-card-title font-extrabold text-[17px] leading-tight"
+										>
+											Shakshuka
+										</div>
+										<div class="recipe-card-meta text-xs text-neutral-600">
+											7 ingredients · 25 min
+										</div>
+									</div>
+									<button
+										type="button"
+										class="favorite-toggle"
+										data-recipe-id="2"
+										aria-label="Not favorite"
+										data-favorited="false"
+									>
+										<svg
+											width="17"
+											height="17"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linejoin="round"
+											class="opacity-35"
+										>
+											<path
+												d="M11.5 2.5 14 8l6 .8-4.4 4.2 1 5.9-5.1-2.7-5.1 2.7 1-5.9L3 8.8 9 8z"
+											></path>
+										</svg>
+									</button>
+								</div>
+								<div
+									class="recipe-card-status flex items-center gap-1.5 text-xs text-accent-700 font-semibold"
+									data-status="ready"
+								>
+									<svg
+										width="13"
+										height="13"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2.4"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M20 6 9 17l-5-5"></path>
+									</svg>
+									Pantry ready — you have everything
+								</div>
+								<div
+									class="recipe-card-ingredients text-[13px] text-neutral-700"
+								>
+									eggs · tomatoes · onion · garlic · olive oil +2
+								</div>
+								<div class="flex gap-1 flex-wrap items-center">
+									<span
+										class="tag-pill text-[11px] rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+										>breakfast</span
+									>
+									<span
+										class="tag-pill text-[11px] rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+										>spicy</span
+									>
+									<span
+										class="tag-pill text-[11px] rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+										>vegetarian</span
+									>
+									<button
+										type="button"
+										class="delete-recipe-btn ml-auto text-neutral-600 hover:text-accent hover:bg-accent/10 rounded-lg p-1.5"
+										data-recipe-id="2"
+										aria-label="Delete recipe"
+									>
+										<svg
+											width="15"
+											height="15"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path d="M3 6h18"></path>
+											<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+											<path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+										</svg>
+									</button>
+								</div>
+							</article>
+
+							<!-- Card: Caprese Salad (pantry ready, favorited) -->
+							<article
+								class="recipe-card bg-neutral-200 rounded-2xl p-3 flex flex-col gap-2 border-t-[3px] border-accent"
+								data-recipe-id="3"
+							>
+								<div class="flex gap-3 items-center mb-1">
+									<div
+										class="w-[42px] h-[42px] rounded-xl bg-accent-100 flex items-center justify-center shrink-0"
+									>
+										<svg
+											width="20"
+											height="20"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="#ae1800"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path
+												d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"
+											></path>
+											<path
+												d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"
+											></path>
+										</svg>
+									</div>
+									<div class="flex-1 min-w-0">
+										<div
+											class="recipe-card-title font-extrabold text-[17px] leading-tight"
+										>
+											Caprese Salad
+										</div>
+										<div class="recipe-card-meta text-xs text-neutral-600">
+											5 ingredients · 10 min
+										</div>
+									</div>
+									<button
+										type="button"
+										class="favorite-toggle"
+										data-recipe-id="3"
+										aria-label="Favorite"
+										data-favorited="true"
+									>
+										<svg
+											width="17"
+											height="17"
+											viewBox="0 0 24 24"
+											fill="#ec3013"
+											stroke="#ec3013"
+											stroke-width="2"
+											stroke-linejoin="round"
+										>
+											<path
+												d="M11.5 2.5 14 8l6 .8-4.4 4.2 1 5.9-5.1-2.7-5.1 2.7 1-5.9L3 8.8 9 8z"
+											></path>
+										</svg>
+									</button>
+								</div>
+								<div
+									class="recipe-card-status flex items-center gap-1.5 text-xs text-accent-700 font-semibold"
+									data-status="ready"
+								>
+									<svg
+										width="13"
+										height="13"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2.4"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M20 6 9 17l-5-5"></path>
+									</svg>
+									Pantry ready — you have everything
+								</div>
+								<div
+									class="recipe-card-ingredients text-[13px] text-neutral-700"
+								>
+									tomatoes · mozzarella · basil · olive oil +1
+								</div>
+								<div class="flex gap-1 flex-wrap items-center">
+									<span
+										class="tag-pill text-[11px] rounded-full px-2.5 py-0.5 bg-accent-100 text-accent-800"
+										>quick</span
+									>
+									<span
+										class="tag-pill text-[11px] rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+										>vegetarian</span
+									>
+									<button
+										type="button"
+										class="delete-recipe-btn ml-auto text-neutral-600 hover:text-accent hover:bg-accent/10 rounded-lg p-1.5"
+										data-recipe-id="3"
+										aria-label="Delete recipe"
+									>
+										<svg
+											width="15"
+											height="15"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path d="M3 6h18"></path>
+											<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+											<path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+										</svg>
+									</button>
+								</div>
+							</article>
+
+							<!-- Card: Beef Chili (missing 1) -->
+							<article
+								class="recipe-card bg-neutral-200 rounded-2xl p-3 flex flex-col gap-2"
+								data-recipe-id="4"
+							>
+								<div class="flex gap-3 items-center mb-1">
+									<div
+										class="w-[42px] h-[42px] rounded-xl bg-neutral-300 flex items-center justify-center shrink-0"
+									>
+										<svg
+											width="20"
+											height="20"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="#605d5d"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path
+												d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"
+											></path>
+										</svg>
+									</div>
+									<div class="flex-1 min-w-0">
+										<div
+											class="recipe-card-title font-extrabold text-[17px] leading-tight"
+										>
+											Beef Chili
+										</div>
+										<div class="recipe-card-meta text-xs text-neutral-600">
+											9 ingredients · 55 min
+										</div>
+									</div>
+									<button
+										type="button"
+										class="favorite-toggle"
+										data-recipe-id="4"
+										aria-label="Not favorite"
+										data-favorited="false"
+									>
+										<svg
+											width="17"
+											height="17"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linejoin="round"
+											class="opacity-35"
+										>
+											<path
+												d="M11.5 2.5 14 8l6 .8-4.4 4.2 1 5.9-5.1-2.7-5.1 2.7 1-5.9L3 8.8 9 8z"
+											></path>
+										</svg>
+									</button>
+								</div>
+								<div
+									class="recipe-card-status text-xs text-neutral-600 font-semibold"
+									data-status="missing"
+									data-missing-count="1"
+								>
+									Missing 1 — <span class="text-accent-700">cornstarch</span>
+								</div>
+								<div
+									class="recipe-card-ingredients text-[13px] text-neutral-700"
+								>
+									ground beef · beans · tomatoes · onion +5
+								</div>
+								<div class="flex gap-1 flex-wrap items-center">
+									<span
+										class="tag-pill text-[11px] rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+										>comfort</span
+									>
+									<span
+										class="tag-pill text-[11px] rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+										>spicy</span
+									>
+									<span
+										class="tag-pill text-[11px] rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+										>dinner</span
+									>
+									<button
+										type="button"
+										class="delete-recipe-btn ml-auto text-neutral-600 hover:text-accent hover:bg-accent/10 rounded-lg p-1.5"
+										data-recipe-id="4"
+										aria-label="Delete recipe"
+									>
+										<svg
+											width="15"
+											height="15"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path d="M3 6h18"></path>
+											<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+											<path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+										</svg>
+									</button>
+								</div>
+							</article>
+
+							<!-- Card: Miso Ramen (missing 2) -->
+							<article
+								class="recipe-card bg-neutral-200 rounded-2xl p-3 flex flex-col gap-2"
+								data-recipe-id="5"
+							>
+								<div class="flex gap-3 items-center mb-1">
+									<div
+										class="w-[42px] h-[42px] rounded-xl bg-neutral-300 flex items-center justify-center shrink-0"
+									>
+										<svg
+											width="20"
+											height="20"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="#605d5d"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path d="M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9Z"></path>
+											<path d="M7 21h10"></path>
+											<path d="M8 8V5"></path>
+											<path d="M12 8V4"></path>
+											<path d="M16 8V5"></path>
+										</svg>
+									</div>
+									<div class="flex-1 min-w-0">
+										<div
+											class="recipe-card-title font-extrabold text-[17px] leading-tight"
+										>
+											Miso Ramen
+										</div>
+										<div class="recipe-card-meta text-xs text-neutral-600">
+											8 ingredients · 30 min
+										</div>
+									</div>
+									<button
+										type="button"
+										class="favorite-toggle"
+										data-recipe-id="5"
+										aria-label="Not favorite"
+										data-favorited="false"
+									>
+										<svg
+											width="17"
+											height="17"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linejoin="round"
+											class="opacity-35"
+										>
+											<path
+												d="M11.5 2.5 14 8l6 .8-4.4 4.2 1 5.9-5.1-2.7-5.1 2.7 1-5.9L3 8.8 9 8z"
+											></path>
+										</svg>
+									</button>
+								</div>
+								<div
+									class="recipe-card-status text-xs text-neutral-600 font-semibold"
+									data-status="missing"
+									data-missing-count="2"
+								>
+									Missing 2 — <span class="text-accent-700">miso, nori</span>
+								</div>
+								<div
+									class="recipe-card-ingredients text-[13px] text-neutral-700"
+								>
+									noodles · eggs · garlic · onion +4
+								</div>
+								<div class="flex gap-1 flex-wrap items-center">
+									<span
+										class="tag-pill text-[11px] rounded-full px-2.5 py-0.5 bg-accent-100 text-accent-800"
+										>quick</span
+									>
+									<span
+										class="tag-pill text-[11px] rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+										>dinner</span
+									>
+									<span
+										class="tag-pill text-[11px] rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+										>comfort</span
+									>
+									<button
+										type="button"
+										class="delete-recipe-btn ml-auto text-neutral-600 hover:text-accent hover:bg-accent/10 rounded-lg p-1.5"
+										data-recipe-id="5"
+										aria-label="Delete recipe"
+									>
+										<svg
+											width="15"
+											height="15"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path d="M3 6h18"></path>
+											<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+											<path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+										</svg>
+									</button>
+								</div>
+							</article>
+
+							<!-- Card: Chicken Tikka (missing 3) -->
+							<article
+								class="recipe-card bg-neutral-200 rounded-2xl p-3 flex flex-col gap-2"
+								data-recipe-id="6"
+							>
+								<div class="flex gap-3 items-center mb-1">
+									<div
+										class="w-[42px] h-[42px] rounded-xl bg-neutral-300 flex items-center justify-center shrink-0"
+									>
+										<svg
+											width="20"
+											height="20"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="#605d5d"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path
+												d="M15.4 15.63a7.875 6 135 1 1 6.23-6.23 4.5 3.43 135 0 0-6.23 6.23"
+											></path>
+											<path
+												d="m8.29 12.71-2.6 2.6a2.5 2.5 0 1 0-1.65 4.65A2.5 2.5 0 1 0 8.7 18.3l2.59-2.59"
+											></path>
+										</svg>
+									</div>
+									<div class="flex-1 min-w-0">
+										<div
+											class="recipe-card-title font-extrabold text-[17px] leading-tight"
+										>
+											Chicken Tikka
+										</div>
+										<div class="recipe-card-meta text-xs text-neutral-600">
+											10 ingredients · 45 min
+										</div>
+									</div>
+									<button
+										type="button"
+										class="favorite-toggle"
+										data-recipe-id="6"
+										aria-label="Not favorite"
+										data-favorited="false"
+									>
+										<svg
+											width="17"
+											height="17"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linejoin="round"
+											class="opacity-35"
+										>
+											<path
+												d="M11.5 2.5 14 8l6 .8-4.4 4.2 1 5.9-5.1-2.7-5.1 2.7 1-5.9L3 8.8 9 8z"
+											></path>
+										</svg>
+									</button>
+								</div>
+								<div
+									class="recipe-card-status text-xs text-neutral-600 font-semibold"
+									data-status="missing"
+									data-missing-count="3"
+								>
+									Missing 3 —
+									<span class="text-accent-700"
+										>yogurt, garam masala, cream</span
+									>
+								</div>
+								<div
+									class="recipe-card-ingredients text-[13px] text-neutral-700"
+								>
+									chicken · tomatoes · onion · garlic +6
+								</div>
+								<div class="flex gap-1 flex-wrap items-center">
+									<span
+										class="tag-pill text-[11px] rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+										>spicy</span
+									>
+									<span
+										class="tag-pill text-[11px] rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+										>dinner</span
+									>
+									<button
+										type="button"
+										class="delete-recipe-btn ml-auto text-neutral-600 hover:text-accent hover:bg-accent/10 rounded-lg p-1.5"
+										data-recipe-id="6"
+										aria-label="Delete recipe"
+									>
+										<svg
+											width="15"
+											height="15"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										>
+											<path d="M3 6h18"></path>
+											<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+											<path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+										</svg>
+									</button>
+								</div>
+							</article>
+						</div>
+						<!-- /#recipe-grid -->
+
+						<!-- Empty state — hidden by default, show via JS when the filtered list is empty -->
+						<div
+							id="recipe-empty-state"
+							hidden
+							class="text-center py-12 text-neutral-600 text-sm"
+						>
+							No recipes match your search or filters.
+						</div>
+
+						<!-- Tag analytics footer -->
+						<footer
+							id="tag-analytics"
+							class="border-t-2 border-neutral-900/10 mt-6 pt-3 flex gap-4 flex-wrap text-[13px] text-neutral-700"
+						>
+							<span class="tracking-wide uppercase text-xs text-neutral-600"
+								>Tag analytics</span
+							>
+							<!-- Each span: class="tag-analytics-item" data-tag="<tag>" -->
+							<span class="tag-analytics-item" data-tag="quick"
+								><span
+									class="inline-block w-2 h-2 rounded-full bg-accent mr-1.5"
+								></span
+								>quick 4</span
+							>
+							<span class="tag-analytics-item" data-tag="vegetarian"
+								><span
+									class="inline-block w-2 h-2 rounded-full bg-neutral-400 mr-1.5"
+								></span
+								>vegetarian 3</span
+							>
+							<span class="tag-analytics-item" data-tag="dinner"
+								><span
+									class="inline-block w-2 h-2 rounded-full bg-neutral-400 mr-1.5"
+								></span
+								>dinner 3</span
+							>
+							<span class="tag-analytics-item" data-tag="spicy"
+								><span
+									class="inline-block w-2 h-2 rounded-full bg-neutral-400 mr-1.5"
+								></span
+								>spicy 2</span
+							>
+							<span class="tag-analytics-item" data-tag="comfort"
+								><span
+									class="inline-block w-2 h-2 rounded-full bg-neutral-400 mr-1.5"
+								></span
+								>comfort 2</span
+							>
+							<span class="tag-analytics-item" data-tag="breakfast"
+								><span
+									class="inline-block w-2 h-2 rounded-full bg-neutral-400 mr-1.5"
+								></span
+								>breakfast 1</span
+							>
+						</footer>
+					</section>
+
+					<!-- Pantry sidebar -->
+					<aside
+						id="pantry-sidebar"
+						class="bg-neutral-200 rounded-2xl p-3 shadow-md sticky top-4"
+					>
+						<div class="flex items-center justify-between mb-3">
+							<div class="text-[10px] tracking-wide uppercase text-accent">
+								My pantry
+							</div>
+							<span
+								id="pantry-item-count"
+								class="text-[11px] rounded-full px-2.5 py-0.5 bg-accent-100 text-accent-800"
+								>12 items</span
+							>
+						</div>
+						<div class="flex gap-1 mb-3">
+							<input
+								id="pantry-quick-add-input"
+								type="text"
+								placeholder="Quick add…"
+								class="flex-1 min-w-0 min-h-9 px-2.5 text-sm bg-neutral-100 border border-neutral-900/10 rounded-xl focus:border-accent focus:outline-none"
+							/>
+							<button
+								type="button"
+								id="pantry-quick-add-btn"
+								aria-label="Add to pantry"
+								class="border border-neutral-300 hover:bg-neutral-900/5 rounded-xl w-9 h-9 flex items-center justify-center shrink-0"
+							>
+								<svg
+									width="15"
+									height="15"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="M5 12h14"></path>
+									<path d="M12 5v14"></path>
+								</svg>
+							</button>
+						</div>
+						<div
+							id="pantry-sidebar-list"
+							class="flex gap-1.5 flex-wrap mb-3 text-[11px]"
+						>
+							<span
+								class="tag-pill rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+								>pasta</span
+							>
+							<span
+								class="tag-pill rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+								>garlic</span
+							>
+							<span
+								class="tag-pill rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+								>butter</span
+							>
+							<span
+								class="tag-pill rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+								>parmesan</span
+							>
+							<span
+								class="tag-pill rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+								>eggs</span
+							>
+							<span
+								class="tag-pill rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+								>tomatoes</span
+							>
+							<span
+								class="tag-pill rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+								>onion</span
+							>
+							<span
+								class="tag-pill rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+								>mozzarella</span
+							>
+							<span
+								class="tag-pill rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+								>basil</span
+							>
+							<span
+								class="tag-pill rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+								>olive oil</span
+							>
+							<span
+								class="tag-pill rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+								>ground beef</span
+							>
+							<span
+								class="tag-pill rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+								>beans</span
+							>
+						</div>
+						<div
+							class="border-t-2 border-neutral-900/10 pt-3 text-[13px] text-neutral-700 mb-3"
+						>
+							<strong id="pantry-ready-recipes-text" class="text-accent-700"
+								>3 recipes ready</strong
+							>
+							· 1 needs a single item
+						</div>
+						<button
+							type="button"
+							id="manage-pantry-btn"
+							onclick="
+								fvGo('pantry');
+								return false;
+							"
+							class="w-full inline-flex items-center gap-1.5 border border-neutral-300 hover:bg-neutral-900/5 font-extrabold text-sm rounded-xl px-4 py-2"
+						>
+							Manage pantry
+							<svg
+								width="14"
+								height="14"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="M5 12h14"></path>
+								<path d="m12 5 7 7-7 7"></path>
+							</svg>
+						</button>
+					</aside>
+				</div>
+			</main>
+		</div>
+
+		<!-- ============================================================
+     SCREEN: ADD RECIPE
+     ============================================================ -->
+		<div class="fv-screen" data-screen="add" hidden>
+			<main class="max-w-[1280px] w-full mx-auto px-6 pt-6 pb-8">
+				<header class="mb-6">
+					<div class="text-[13px] tracking-wide uppercase text-accent-700 mb-1">
+						Recipe box
+					</div>
+					<h1 class="text-[42px] leading-[1.12] m-0">Add a recipe</h1>
+				</header>
+
+				<div
+					class="grid grid-cols-1 md:grid-cols-2 gap-6 border-t-2 border-neutral-900/10 pt-6"
+				>
+					<form id="recipe-form" class="grid gap-4 content-start">
+						<div>
+							<label
+								for="recipe-name-input"
+								class="block text-xs mb-1 text-neutral-700"
+								>Recipe name</label
+							>
+							<input
+								id="recipe-name-input"
+								type="text"
+								required
+								class="w-full min-h-9 px-2.5 text-sm bg-neutral-200 border border-neutral-900/10 rounded-xl focus:border-accent focus:outline-none"
+							/>
+						</div>
+						<div>
+							<label
+								for="recipe-ingredients-input"
+								class="block text-xs mb-1 text-neutral-700"
+							>
+								Ingredients
+								<span class="font-normal opacity-60">— comma separated</span>
+							</label>
+							<textarea
+								id="recipe-ingredients-input"
+								rows="3"
+								class="w-full px-2.5 py-1.5 text-sm bg-neutral-200 border border-neutral-900/10 rounded-xl focus:border-accent focus:outline-none resize-y"
+							></textarea>
+							<div
+								id="ingredient-preview"
+								class="flex gap-1.5 flex-wrap mt-1.5"
+							>
+								<!-- JS renders one .tag-pill per parsed ingredient here, appending " ✓" when it's already in the pantry -->
+							</div>
+							<div class="text-xs text-neutral-600 mt-1">
+								✓ already in your pantry
+							</div>
+						</div>
+						<div class="grid grid-cols-[180px_1fr] gap-4">
+							<div>
+								<label
+									for="recipe-preptime-input"
+									class="block text-xs mb-1 text-neutral-700"
+									>Prep time (min)</label
+								>
+								<input
+									id="recipe-preptime-input"
+									type="number"
+									min="0"
+									class="w-full min-h-9 px-2.5 text-sm bg-neutral-200 border border-neutral-900/10 rounded-xl focus:border-accent focus:outline-none"
+								/>
+							</div>
+							<div>
+								<label
+									for="recipe-tags-input"
+									class="block text-xs mb-1 text-neutral-700"
+								>
+									Tags
+									<span class="font-normal opacity-60">— comma separated</span>
+								</label>
+								<input
+									id="recipe-tags-input"
+									type="text"
+									class="w-full min-h-9 px-2.5 text-sm bg-neutral-200 border border-neutral-900/10 rounded-xl focus:border-accent focus:outline-none"
+								/>
+							</div>
+						</div>
+						<div class="flex gap-2">
+							<button
+								type="submit"
+								id="save-recipe-btn"
+								class="inline-flex items-center gap-1.5 bg-accent hover:bg-accent-600 active:bg-accent-700 text-white font-extrabold text-sm rounded-xl px-4 py-2"
+							>
+								Save recipe
+								<svg
+									width="14"
+									height="14"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="M5 12h14"></path>
+									<path d="m12 5 7 7-7 7"></path>
+								</svg>
+							</button>
+							<button
+								type="button"
+								id="cancel-add-btn"
+								onclick="
+									fvGo('recipes');
+									return false;
+								"
+								class="text-accent hover:bg-accent/10 font-extrabold text-sm rounded-xl px-2 py-2"
+							>
+								Cancel
+							</button>
+						</div>
+					</form>
+
+					<aside class="border-l-2 border-neutral-900/10 pl-6">
+						<div
+							class="text-[11px] tracking-wide uppercase text-neutral-600 mb-3"
+						>
+							Live preview
+						</div>
+						<!-- #recipe-preview-card mirrors a .recipe-card — re-render its contents on every form input event -->
+						<article
+							id="recipe-preview-card"
+							class="bg-neutral-200 rounded-2xl p-3 flex flex-col gap-2 border-t-[3px] border-accent max-w-[380px] shadow-sm"
+						>
+							<div class="flex gap-3 items-center mb-1">
+								<div
+									class="w-[42px] h-[42px] rounded-xl bg-accent-100 flex items-center justify-center shrink-0"
+								>
+									<svg
+										width="20"
+										height="20"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="#ae1800"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path
+											d="m16 2-2.3 2.3a3 3 0 0 0 0 4.2l1.8 1.8a3 3 0 0 0 4.2 0L22 8"
+										></path>
+										<path
+											d="M15 15 3.3 3.3a4.2 4.2 0 0 0 0 6l7.3 7.3c.7.7 2 .7 2.8 0L15 15Zm0 0 7 7"
+										></path>
+										<path d="m2.1 21.8 6.4-6.3"></path>
+										<path d="m19 5-7 7"></path>
+									</svg>
+								</div>
+								<div class="flex-1">
+									<div
+										id="preview-name"
+										class="font-extrabold text-[17px] leading-tight"
+									>
+										Recipe name
+									</div>
+									<div id="preview-meta" class="text-xs text-neutral-600">
+										0 ingredients · 0 min
+									</div>
+								</div>
+							</div>
+							<div
+								id="preview-status"
+								class="flex items-center gap-1.5 text-xs text-accent-700 font-semibold"
+							>
+								<svg
+									width="13"
+									height="13"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2.4"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="M20 6 9 17l-5-5"></path>
+								</svg>
+								Pantry ready — you have everything
+							</div>
+							<div
+								id="preview-ingredients"
+								class="text-[13px] text-neutral-700"
+							></div>
+							<div id="preview-tags" class="flex gap-1 flex-wrap"></div>
+						</article>
+						<p class="text-[13px] text-neutral-700 max-w-[40ch] mt-4">
+							Ingredients and tags are split on commas and trimmed as you type.
+							Duplicate tags are dropped automatically, and the pantry check
+							runs live.
+						</p>
+					</aside>
+				</div>
+			</main>
+		</div>
+
+		<!-- ============================================================
+     SCREEN: MY PANTRY
+     ============================================================ -->
+		<div class="fv-screen" data-screen="pantry" hidden>
+			<main class="max-w-[1280px] w-full mx-auto px-6 pt-6 pb-8">
+				<header class="flex items-end justify-between gap-4 mb-6">
+					<div>
+						<div
+							id="pantry-header-count"
+							class="text-[13px] tracking-wide uppercase text-accent-700 mb-1"
+						>
+							12 items on hand
+						</div>
+						<h1 class="text-[42px] leading-[1.12] m-0">My pantry</h1>
+					</div>
+					<div
+						id="pantry-header-stats"
+						class="flex gap-4 text-[13px] text-neutral-700"
+					>
+						<span
+							><strong class="text-accent-700">3</strong> recipes ready</span
+						>
+						<span><strong>1</strong> one item away</span>
+					</div>
+				</header>
+
+				<div
+					class="grid grid-cols-1 md:grid-cols-[1fr_1.5fr] gap-6 border-t-2 border-neutral-900/10 pt-6"
+				>
+					<section>
+						<div class="mb-4">
+							<label
+								for="pantry-add-input"
+								class="block text-xs mb-1 text-neutral-700"
+								>Add an ingredient</label
+							>
+							<div class="flex gap-2">
+								<input
+									id="pantry-add-input"
+									type="text"
+									placeholder="e.g. olive oil"
+									class="flex-1 min-h-9 px-2.5 text-sm bg-neutral-200 border border-neutral-900/10 rounded-xl focus:border-accent focus:outline-none"
+								/>
+								<button
+									type="button"
+									id="pantry-add-btn"
+									aria-label="Add"
+									class="bg-accent hover:bg-accent-600 active:bg-accent-700 text-white rounded-xl w-9 h-9 flex items-center justify-center shrink-0"
+								>
+									<svg
+										width="16"
+										height="16"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M5 12h14"></path>
+										<path d="M12 5v14"></path>
+									</svg>
+								</button>
+							</div>
+						</div>
+
+						<!-- Categorized grouping is presentational only — the pantry itself is a flat Set of
+           ingredient strings per the data model. If you don't build category assignment,
+           it's reasonable to simplify this into one flat #pantry-list group instead. -->
+						<div id="pantry-categories">
+							<div class="pantry-category" data-category="Produce">
+								<div
+									class="text-[11px] tracking-wide uppercase text-neutral-600 mb-2"
+								>
+									Produce
+								</div>
+								<div class="pantry-item-list flex gap-1.5 flex-wrap mb-4">
+									<span
+										class="pantry-item-tag tag-pill rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+										data-ingredient="tomatoes"
+										>tomatoes
+										<button
+											type="button"
+											class="remove-pantry-item"
+											data-ingredient="tomatoes"
+										>
+											×
+										</button></span
+									>
+									<span
+										class="pantry-item-tag tag-pill rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+										data-ingredient="onion"
+										>onion
+										<button
+											type="button"
+											class="remove-pantry-item"
+											data-ingredient="onion"
+										>
+											×
+										</button></span
+									>
+									<span
+										class="pantry-item-tag tag-pill rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+										data-ingredient="garlic"
+										>garlic
+										<button
+											type="button"
+											class="remove-pantry-item"
+											data-ingredient="garlic"
+										>
+											×
+										</button></span
+									>
+									<span
+										class="pantry-item-tag tag-pill rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+										data-ingredient="basil"
+										>basil
+										<button
+											type="button"
+											class="remove-pantry-item"
+											data-ingredient="basil"
+										>
+											×
+										</button></span
+									>
+								</div>
+							</div>
+							<div class="pantry-category" data-category="Dairy & eggs">
+								<div
+									class="text-[11px] tracking-wide uppercase text-neutral-600 mb-2"
+								>
+									Dairy &amp; eggs
+								</div>
+								<div class="pantry-item-list flex gap-1.5 flex-wrap mb-4">
+									<span
+										class="pantry-item-tag tag-pill rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+										data-ingredient="butter"
+										>butter
+										<button
+											type="button"
+											class="remove-pantry-item"
+											data-ingredient="butter"
+										>
+											×
+										</button></span
+									>
+									<span
+										class="pantry-item-tag tag-pill rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+										data-ingredient="parmesan"
+										>parmesan
+										<button
+											type="button"
+											class="remove-pantry-item"
+											data-ingredient="parmesan"
+										>
+											×
+										</button></span
+									>
+									<span
+										class="pantry-item-tag tag-pill rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+										data-ingredient="mozzarella"
+										>mozzarella
+										<button
+											type="button"
+											class="remove-pantry-item"
+											data-ingredient="mozzarella"
+										>
+											×
+										</button></span
+									>
+									<span
+										class="pantry-item-tag tag-pill rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+										data-ingredient="eggs"
+										>eggs
+										<button
+											type="button"
+											class="remove-pantry-item"
+											data-ingredient="eggs"
+										>
+											×
+										</button></span
+									>
+								</div>
+							</div>
+							<div class="pantry-category" data-category="Staples">
+								<div
+									class="text-[11px] tracking-wide uppercase text-neutral-600 mb-2"
+								>
+									Staples
+								</div>
+								<div class="pantry-item-list flex gap-1.5 flex-wrap mb-4">
+									<span
+										class="pantry-item-tag tag-pill rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+										data-ingredient="pasta"
+										>pasta
+										<button
+											type="button"
+											class="remove-pantry-item"
+											data-ingredient="pasta"
+										>
+											×
+										</button></span
+									>
+									<span
+										class="pantry-item-tag tag-pill rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+										data-ingredient="olive oil"
+										>olive oil
+										<button
+											type="button"
+											class="remove-pantry-item"
+											data-ingredient="olive oil"
+										>
+											×
+										</button></span
+									>
+									<span
+										class="pantry-item-tag tag-pill rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+										data-ingredient="beans"
+										>beans
+										<button
+											type="button"
+											class="remove-pantry-item"
+											data-ingredient="beans"
+										>
+											×
+										</button></span
+									>
+								</div>
+							</div>
+							<div class="pantry-category" data-category="Protein">
+								<div
+									class="text-[11px] tracking-wide uppercase text-neutral-600 mb-2"
+								>
+									Protein
+								</div>
+								<div class="pantry-item-list flex gap-1.5 flex-wrap mb-4">
+									<span
+										class="pantry-item-tag tag-pill rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+										data-ingredient="ground beef"
+										>ground beef
+										<button
+											type="button"
+											class="remove-pantry-item"
+											data-ingredient="ground beef"
+										>
+											×
+										</button></span
+									>
+								</div>
+							</div>
+						</div>
+						<p class="text-[13px] text-neutral-700 max-w-[38ch]">
+							The pantry is a Set — adding "Garlic" twice keeps one entry.
+							Recipes light up on the right the moment every ingredient is
+							covered.
+						</p>
+					</section>
+
+					<section>
+						<div
+							class="text-[11px] tracking-wide uppercase text-neutral-600 mb-3"
+						>
+							What can I make?
+						</div>
+						<table
+							id="pantry-recipe-table"
+							class="w-full text-sm border-collapse"
+						>
+							<thead>
+								<tr>
+									<th
+										class="text-left text-[11px] tracking-wide uppercase text-neutral-600 pb-2 border-b-2 border-neutral-900/10"
+									>
+										Recipe
+									</th>
+									<th
+										class="text-left text-[11px] tracking-wide uppercase text-neutral-600 pb-2 border-b-2 border-neutral-900/10"
+									>
+										Have
+									</th>
+									<th
+										class="text-left text-[11px] tracking-wide uppercase text-neutral-600 pb-2 border-b-2 border-neutral-900/10"
+									>
+										Missing
+									</th>
+									<th
+										class="text-left text-[11px] tracking-wide uppercase text-neutral-600 pb-2 border-b-2 border-neutral-900/10"
+									>
+										Status
+									</th>
+								</tr>
+							</thead>
+							<tbody id="pantry-recipe-table-body">
+								<!-- One <tr class="pantry-recipe-row" data-recipe-id="..."> per recipe, rebuilt whenever the pantry changes -->
+								<tr class="pantry-recipe-row" data-recipe-id="1">
+									<td class="py-2 border-b border-neutral-900/10">
+										Garlic Butter Pasta
+									</td>
+									<td class="py-2 border-b border-neutral-900/10">4 / 4</td>
+									<td class="py-2 border-b border-neutral-900/10">—</td>
+									<td class="py-2 border-b border-neutral-900/10">
+										<span
+											class="text-[11px] rounded-full px-2.5 py-0.5 bg-accent-100 text-accent-800"
+											>Ready</span
+										>
+									</td>
+								</tr>
+								<tr class="pantry-recipe-row" data-recipe-id="3">
+									<td class="py-2 border-b border-neutral-900/10">
+										Caprese Salad
+									</td>
+									<td class="py-2 border-b border-neutral-900/10">5 / 5</td>
+									<td class="py-2 border-b border-neutral-900/10">—</td>
+									<td class="py-2 border-b border-neutral-900/10">
+										<span
+											class="text-[11px] rounded-full px-2.5 py-0.5 bg-accent-100 text-accent-800"
+											>Ready</span
+										>
+									</td>
+								</tr>
+								<tr class="pantry-recipe-row" data-recipe-id="2">
+									<td class="py-2 border-b border-neutral-900/10">Shakshuka</td>
+									<td class="py-2 border-b border-neutral-900/10">7 / 7</td>
+									<td class="py-2 border-b border-neutral-900/10">—</td>
+									<td class="py-2 border-b border-neutral-900/10">
+										<span
+											class="text-[11px] rounded-full px-2.5 py-0.5 bg-accent-100 text-accent-800"
+											>Ready</span
+										>
+									</td>
+								</tr>
+								<tr class="pantry-recipe-row" data-recipe-id="4">
+									<td class="py-2 border-b border-neutral-900/10">
+										Beef Chili
+									</td>
+									<td class="py-2 border-b border-neutral-900/10">8 / 9</td>
+									<td class="py-2 border-b border-neutral-900/10">
+										cornstarch
+									</td>
+									<td class="py-2 border-b border-neutral-900/10">
+										<span
+											class="text-[11px] rounded-full px-2.5 py-0.5 border border-accent text-accent"
+											>Missing 1</span
+										>
+									</td>
+								</tr>
+								<tr class="pantry-recipe-row" data-recipe-id="5">
+									<td class="py-2 border-b border-neutral-900/10">
+										Miso Ramen
+									</td>
+									<td class="py-2 border-b border-neutral-900/10">6 / 8</td>
+									<td class="py-2 border-b border-neutral-900/10">
+										miso, nori
+									</td>
+									<td class="py-2 border-b border-neutral-900/10">
+										<span
+											class="text-[11px] rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+											>Missing 2</span
+										>
+									</td>
+								</tr>
+								<tr class="pantry-recipe-row" data-recipe-id="6">
+									<td class="py-2 border-b border-neutral-900/10">
+										Chicken Tikka
+									</td>
+									<td class="py-2 border-b border-neutral-900/10">7 / 10</td>
+									<td class="py-2 border-b border-neutral-900/10">
+										yogurt, garam masala, cream
+									</td>
+									<td class="py-2 border-b border-neutral-900/10">
+										<span
+											class="text-[11px] rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+											>Missing 3</span
+										>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<div
+							id="shopping-tip-callout"
+							class="bg-neutral-200 rounded-2xl p-3 shadow-sm mt-4 flex items-center gap-3"
+						>
+							<div
+								class="w-9 h-9 rounded-xl bg-accent-100 flex items-center justify-center shrink-0"
+							>
+								<svg
+									width="17"
+									height="17"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="#ae1800"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<circle cx="8" cy="21" r="1"></circle>
+									<circle cx="19" cy="21" r="1"></circle>
+									<path
+										d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"
+									></path>
+								</svg>
+							</div>
+							<div class="text-[13px] text-neutral-800">
+								<strong>Shopping tip</strong> — adding
+								<strong class="text-accent-700">cornstarch</strong> unlocks Beef
+								Chili, your closest recipe.
+							</div>
+						</div>
+					</section>
+				</div>
+			</main>
+		</div>
+
+		<!-- ============================================================
+     SCREEN: RECIPE DETAIL
+     ============================================================ -->
+		<div class="fv-screen" data-screen="detail" hidden>
+			<main class="max-w-[960px] w-full mx-auto px-6 pt-6 pb-8">
+				<a
+					href="#"
+					onclick="
+						fvGo('recipes');
+						return false;
+					"
+					class="inline-flex items-center gap-1.5 text-[13px] text-neutral-700 no-underline mb-4"
+				>
+					<svg
+						width="14"
+						height="14"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					>
+						<path d="m12 19-7-7 7-7"></path>
+						<path d="M19 12H5"></path>
+					</svg>
+					Back to recipes
+				</a>
+				<header class="flex gap-4 items-center mb-5">
+					<div
+						class="w-16 h-16 rounded-2xl bg-accent-100 flex items-center justify-center shrink-0"
+					>
+						<svg
+							width="30"
+							height="30"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="#ae1800"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<path
+								d="m16 2-2.3 2.3a3 3 0 0 0 0 4.2l1.8 1.8a3 3 0 0 0 4.2 0L22 8"
+							></path>
+							<path
+								d="M15 15 3.3 3.3a4.2 4.2 0 0 0 0 6l7.3 7.3c.7.7 2 .7 2.8 0L15 15Zm0 0 7 7"
+							></path>
+							<path d="m2.1 21.8 6.4-6.3"></path>
+							<path d="m19 5-7 7"></path>
+						</svg>
+					</div>
+					<div class="flex-1">
+						<h1 id="detail-title" class="m-0 mb-1">Garlic Butter Pasta</h1>
+						<div class="flex gap-3 items-center text-[13px] text-neutral-700">
+							<span
+								id="detail-preptime-inline"
+								class="inline-flex items-center gap-1"
+							>
+								<svg
+									width="13"
+									height="13"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<circle cx="12" cy="12" r="10"></circle>
+									<polyline points="12 6 12 12 16 14"></polyline>
+								</svg>
+								20 min
+							</span>
+							<span>·</span>
+							<span id="detail-ingredient-count">4 ingredients</span>
+							<span>·</span>
+							<span
+								id="detail-status-tag"
+								class="text-[11px] rounded-full px-2.5 py-0.5 bg-accent-100 text-accent-800"
+								>Pantry ready</span
+							>
+						</div>
+					</div>
+					<div class="flex gap-2">
+						<button
+							type="button"
+							id="detail-favorite-btn"
+							aria-label="Favorite"
+							class="border border-neutral-300 hover:bg-neutral-900/5 rounded-xl w-9 h-9 flex items-center justify-center"
+						>
+							<svg
+								width="16"
+								height="16"
+								viewBox="0 0 24 24"
+								fill="#ec3013"
+								stroke="#ec3013"
+								stroke-width="2"
+								stroke-linejoin="round"
+							>
+								<path
+									d="M11.5 2.5 14 8l6 .8-4.4 4.2 1 5.9-5.1-2.7-5.1 2.7 1-5.9L3 8.8 9 8z"
+								></path>
+							</svg>
+						</button>
+						<button
+							type="button"
+							id="detail-edit-btn"
+							onclick="
+								fvGo('add');
+								return false;
+							"
+							class="border border-neutral-300 hover:bg-neutral-900/5 font-extrabold text-sm rounded-xl px-4 py-2"
+						>
+							Edit
+						</button>
+						<button
+							type="button"
+							id="detail-delete-btn"
+							aria-label="Delete recipe"
+							class="text-accent hover:bg-accent/10 rounded-xl w-9 h-9 flex items-center justify-center"
+						>
+							<svg
+								width="16"
+								height="16"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="M3 6h18"></path>
+								<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+								<path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+							</svg>
+						</button>
+					</div>
+				</header>
+
+				<div
+					class="grid grid-cols-1 md:grid-cols-2 gap-6 border-t-2 border-neutral-900/10 pt-5"
+				>
+					<section>
+						<div
+							class="text-[11px] tracking-wide uppercase text-neutral-600 mb-3"
+						>
+							Ingredients · pantry check
+						</div>
+						<div id="detail-ingredients-list" class="grid gap-2">
+							<!-- One row per ingredient: class="detail-ingredient-row", data-ingredient, data-in-pantry -->
+							<div
+								class="detail-ingredient-row bg-neutral-200 rounded-xl px-3 py-2 flex items-center gap-3"
+								data-ingredient="pasta"
+								data-in-pantry="true"
+							>
+								<svg
+									width="15"
+									height="15"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="#ae1800"
+									stroke-width="2.4"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="M20 6 9 17l-5-5"></path>
+								</svg>
+								<span class="flex-1">pasta</span>
+								<span
+									class="text-[11px] rounded-full px-2.5 py-0.5 bg-accent-100 text-accent-800"
+									>in pantry</span
+								>
+							</div>
+							<div
+								class="detail-ingredient-row bg-neutral-200 rounded-xl px-3 py-2 flex items-center gap-3"
+								data-ingredient="garlic"
+								data-in-pantry="true"
+							>
+								<svg
+									width="15"
+									height="15"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="#ae1800"
+									stroke-width="2.4"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="M20 6 9 17l-5-5"></path>
+								</svg>
+								<span class="flex-1">garlic</span>
+								<span
+									class="text-[11px] rounded-full px-2.5 py-0.5 bg-accent-100 text-accent-800"
+									>in pantry</span
+								>
+							</div>
+							<div
+								class="detail-ingredient-row bg-neutral-200 rounded-xl px-3 py-2 flex items-center gap-3"
+								data-ingredient="butter"
+								data-in-pantry="true"
+							>
+								<svg
+									width="15"
+									height="15"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="#ae1800"
+									stroke-width="2.4"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="M20 6 9 17l-5-5"></path>
+								</svg>
+								<span class="flex-1">butter</span>
+								<span
+									class="text-[11px] rounded-full px-2.5 py-0.5 bg-accent-100 text-accent-800"
+									>in pantry</span
+								>
+							</div>
+							<div
+								class="detail-ingredient-row bg-neutral-200 rounded-xl px-3 py-2 flex items-center gap-3"
+								data-ingredient="parmesan"
+								data-in-pantry="true"
+							>
+								<svg
+									width="15"
+									height="15"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="#ae1800"
+									stroke-width="2.4"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="M20 6 9 17l-5-5"></path>
+								</svg>
+								<span class="flex-1">parmesan</span>
+								<span
+									class="text-[11px] rounded-full px-2.5 py-0.5 bg-accent-100 text-accent-800"
+									>in pantry</span
+								>
+							</div>
+						</div>
+					</section>
+					<section>
+						<div
+							class="text-[11px] tracking-wide uppercase text-neutral-600 mb-3"
+						>
+							Details
+						</div>
+						<div class="bg-neutral-200 rounded-2xl p-3 grid gap-3 shadow-sm">
+							<div class="flex justify-between text-[13px]">
+								<span class="text-neutral-600">Tags</span>
+								<span id="detail-tags" class="flex gap-1.5">
+									<span
+										class="text-[11px] rounded-full px-2.5 py-0.5 bg-accent-100 text-accent-800"
+										>quick</span
+									>
+									<span
+										class="text-[11px] rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800"
+										>vegetarian</span
+									>
+								</span>
+							</div>
+							<div
+								class="flex justify-between text-[13px] border-t border-neutral-900/10 pt-3"
+							>
+								<span class="text-neutral-600">Prep time</span>
+								<strong id="detail-preptime">20 minutes</strong>
+							</div>
+							<div
+								class="flex justify-between text-[13px] border-t border-neutral-900/10 pt-3"
+							>
+								<span class="text-neutral-600">Added</span>
+								<span id="detail-added-date">Aug 12, 2026</span>
+							</div>
+							<div
+								class="flex justify-between text-[13px] border-t border-neutral-900/10 pt-3"
+							>
+								<span class="text-neutral-600">Cooked</span>
+								<span id="detail-cooked-count">6 times</span>
+							</div>
+						</div>
+						<button
+							type="button"
+							id="detail-start-cooking-btn"
+							class="w-full mt-4 inline-flex items-center justify-start gap-1.5 bg-accent hover:bg-accent-600 active:bg-accent-700 text-white font-extrabold text-sm rounded-xl px-4 py-2"
+						>
+							Start cooking
+							<svg
+								width="14"
+								height="14"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="M5 12h14"></path>
+								<path d="m12 5 7 7-7 7"></path>
+							</svg>
+						</button>
+					</section>
+				</div>
+			</main>
+		</div>
+
+		<!-- ============================================================
+     SCREEN: SHOPPING LIST
+     ============================================================ -->
+		<div class="fv-screen" data-screen="shopping" hidden>
+			<main class="max-w-[960px] w-full mx-auto px-6 pt-6 pb-8">
+				<header class="flex items-end justify-between gap-4 mb-5">
+					<div>
+						<div
+							id="shopping-header-count"
+							class="text-[13px] tracking-wide uppercase text-accent-700 mb-1"
+						>
+							6 items · unlocks 3 recipes
+						</div>
+						<h1 class="m-0">Shopping list</h1>
+					</div>
+					<button
+						type="button"
+						id="clear-checked-btn"
+						class="border border-neutral-300 hover:bg-neutral-900/5 font-extrabold text-sm rounded-xl px-4 py-2"
+					>
+						Clear checked
+					</button>
+				</header>
+
+				<div
+					class="grid grid-cols-1 md:grid-cols-[1.4fr_1fr] gap-6 border-t-2 border-neutral-900/10 pt-5"
+				>
+					<section id="shopping-list" class="grid gap-2 content-start">
+						<!-- One label per item: class="shopping-item", data-item, checkbox class="shopping-item-checkbox" -->
+						<label
+							class="shopping-item bg-neutral-200 rounded-xl px-3 py-2 flex items-center gap-3 cursor-pointer"
+							data-item="cornstarch"
+						>
+							<input type="checkbox" class="shopping-item-checkbox" checked />
+							<span class="flex-1 line-through opacity-50">cornstarch</span>
+							<span
+								class="text-[11px] rounded-full px-2.5 py-0.5 bg-accent-100 text-accent-800"
+								>unlocks Beef Chili</span
+							>
+						</label>
+						<label
+							class="shopping-item bg-neutral-200 rounded-xl px-3 py-2 flex items-center gap-3 cursor-pointer"
+							data-item="miso paste"
+						>
+							<input type="checkbox" class="shopping-item-checkbox" />
+							<span class="flex-1">miso paste</span>
+							<span
+								class="text-[11px] rounded-full px-2.5 py-0.5 border border-accent text-accent"
+								>Miso Ramen</span
+							>
+						</label>
+						<label
+							class="shopping-item bg-neutral-200 rounded-xl px-3 py-2 flex items-center gap-3 cursor-pointer"
+							data-item="nori"
+						>
+							<input type="checkbox" class="shopping-item-checkbox" />
+							<span class="flex-1">nori</span>
+							<span
+								class="text-[11px] rounded-full px-2.5 py-0.5 border border-accent text-accent"
+								>Miso Ramen</span
+							>
+						</label>
+						<label
+							class="shopping-item bg-neutral-200 rounded-xl px-3 py-2 flex items-center gap-3 cursor-pointer"
+							data-item="yogurt"
+						>
+							<input type="checkbox" class="shopping-item-checkbox" />
+							<span class="flex-1">yogurt</span>
+							<span
+								class="text-[11px] rounded-full px-2.5 py-0.5 border border-accent text-accent"
+								>Chicken Tikka</span
+							>
+						</label>
+						<label
+							class="shopping-item bg-neutral-200 rounded-xl px-3 py-2 flex items-center gap-3 cursor-pointer"
+							data-item="garam masala"
+						>
+							<input type="checkbox" class="shopping-item-checkbox" />
+							<span class="flex-1">garam masala</span>
+							<span
+								class="text-[11px] rounded-full px-2.5 py-0.5 border border-accent text-accent"
+								>Chicken Tikka</span
+							>
+						</label>
+						<label
+							class="shopping-item bg-neutral-200 rounded-xl px-3 py-2 flex items-center gap-3 cursor-pointer"
+							data-item="cream"
+						>
+							<input type="checkbox" class="shopping-item-checkbox" />
+							<span class="flex-1">cream</span>
+							<span
+								class="text-[11px] rounded-full px-2.5 py-0.5 border border-accent text-accent"
+								>Chicken Tikka</span
+							>
+						</label>
+						<div class="flex gap-2 mt-2">
+							<input
+								id="shopping-add-input"
+								type="text"
+								placeholder="Add an item…"
+								class="flex-1 min-h-9 px-2.5 text-sm bg-neutral-200 border border-neutral-900/10 rounded-xl focus:border-accent focus:outline-none"
+							/>
+							<button
+								type="button"
+								id="shopping-add-btn"
+								aria-label="Add item"
+								class="bg-accent hover:bg-accent-600 active:bg-accent-700 text-white rounded-xl w-9 h-9 flex items-center justify-center shrink-0"
+							>
+								<svg
+									width="16"
+									height="16"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="M5 12h14"></path>
+									<path d="M12 5v14"></path>
+								</svg>
+							</button>
+						</div>
+					</section>
+
+					<aside class="grid gap-4 content-start">
+						<div class="bg-neutral-200 rounded-2xl p-3 shadow-sm">
+							<div class="text-[10px] tracking-wide uppercase text-accent">
+								Progress
+							</div>
+							<div
+								class="flex justify-between text-[13px] text-neutral-700 my-2"
+							>
+								<span id="shopping-progress-label">1 of 6 checked</span>
+								<span id="shopping-progress-pct">17%</span>
+							</div>
+							<div class="h-2 rounded-full bg-neutral-300 overflow-hidden">
+								<div
+									id="shopping-progress-bar"
+									class="h-full bg-accent"
+									style="width: 17%"
+								></div>
+							</div>
+						</div>
+						<div
+							id="shopping-almost-there"
+							class="bg-neutral-200 rounded-2xl p-3 shadow-sm"
+						>
+							<div class="text-[10px] tracking-wide uppercase text-accent">
+								Almost there
+							</div>
+							<p class="text-[13px] text-neutral-700 mt-2 mb-0">
+								Checking off
+								<strong class="text-accent-700">miso paste</strong> and
+								<strong class="text-accent-700">nori</strong>
+								makes Miso Ramen your 5th pantry-ready recipe.
+							</p>
+						</div>
+						<button
+							type="button"
+							id="move-checked-btn"
+							onclick="
+								fvGo('pantry');
+								return false;
+							"
+							class="w-full inline-flex items-center gap-1.5 border border-neutral-300 hover:bg-neutral-900/5 font-extrabold text-sm rounded-xl px-4 py-2"
+						>
+							Move checked to pantry
+							<svg
+								width="14"
+								height="14"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="M5 12h14"></path>
+								<path d="m12 5 7 7-7 7"></path>
+							</svg>
+						</button>
+					</aside>
+				</div>
+			</main>
+		</div>
+
+		<script src="script.js"></script>
+	</body>
+</html>

@@ -217,6 +217,17 @@ document.addEventListener('DOMContentLoaded', () => {
 							</article>`;
 		return recipeCard;
 	}
+
+	function renderRecipes() {
+		const recipeGrid = document.querySelector(`#recipe-grid`);
+		const cardHTML = recipeBook.recipes
+			.map((recipe) => buildRecipeCard(recipe))
+			.join('');
+		recipeGrid.innerHTML = cardHTML;
+	}
+
+	renderRecipes();
+
 	//  function renderTagCloud() {}
 	//  function renderPantrySidebar() {}
 

@@ -35,7 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	const pantry = new Set([]);
 
-	// 2. recipeBook
+	// 2. RECIPE BOOK OBJECT WITH METHODS
+
 	const recipeBook = {
 		//Recipes Array [Array of Objects]
 		recipes: [
@@ -54,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
 					'eggs',
 					'tomatoes',
 					'onion',
-					'garlic',
+					'Garlic',
 					'olive oil',
 					'basil',
 					'black pepper'
@@ -68,7 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		add(recipe) {
 			if (!recipe.id) {
 				recipe.id = crypto.randomUUID();
-				console.log(recipe);
 			}
 			this.recipes = [...this.recipes, recipe];
 			return recipe;
@@ -76,21 +76,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		//Removing Recipe
 		remove(id) {
-			return this.recipes.filter((recipe) => recipe.id != id);
+			const originalLength = this.recipes.length;
+			this.recipes = this.recipes.filter((recipe) => recipe.id !== id);
+			return this.recipes.length < originalLength;
 		},
 
 		//Finding Recipe
 		findByIngredient(ingredient) {
 			return this.recipes.filter((recipe) => {
-				return recipe.ingredients.includes(ingredient);
+				return recipe.ingredients.some(
+					(ing) => ing.toLowerCase() === ingredient.toLowerCase()
+				);
 			});
 		}
 	};
 
 	// 3. RENDER FUNCTIONS
-	//    function renderRecipes() { ... }
-	//    function renderTagCloud() { ... }
-	//    function renderPantrySidebar() { ... }
+	//  function renderRecipes() {}
+	//  function renderTagCloud() {}
+	//  function renderPantrySidebar() {}
 
 	// 4. HELPERS
 	//    function parseCommaList(input) { ... }
@@ -99,15 +103,4 @@ document.addEventListener('DOMContentLoaded', () => {
 	// 5. EVENT LISTENERS
 	//    document.getElementById('recipe-form').addEventListener('submit', ...);
 	//    document.getElementById('search-input').addEventListener('input', ...);
-
-	//TESTS
-
-	recipeBook.add({
-		name: 'Test',
-		ingredients: [],
-		tags: new Set(),
-		prepTime: 5
-	});
-
-	console.log(recipeBook.findByIngredient('garlic'));
 });

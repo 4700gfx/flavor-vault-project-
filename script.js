@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				name: 'Garlic Butter Pasta',
 				ingredients: ['pasta', 'garlic', 'butter', 'parmesan'],
 				tags: new Set(['quick', 'vegetarian']),
-				prepTime: 40
+				prepTime: 20
 			},
 
 			{
@@ -92,7 +92,10 @@ document.addEventListener('DOMContentLoaded', () => {
 	};
 
 	// 3. RENDER FUNCTIONS
+
+	//Builds Single Recipe Cards
 	function buildRecipeCard({ id, name, ingredients, tags, prepTime }) {
+		//Adds Tag Span with Style Options
 		const tagsHTML = [...tags]
 			.map((tag) => {
 				const tagClass =
@@ -102,6 +105,8 @@ document.addEventListener('DOMContentLoaded', () => {
 				return `<span class="tag-pill text-[11px] rounded-full px-2.5 py-0.5 ${tagClass}">${tag}</span>`;
 			})
 			.join('');
+
+		//Recipe Card HTML
 		const recipeCard = `<article class="recipe-card bg-neutral-200 rounded-2xl p-3 flex flex-col gap-2 border-t-[3px] border-accent" data-recipe-id="${id}">
 								<div class="flex gap-3 items-center mb-1">
 									<div
@@ -218,6 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		return recipeCard;
 	}
 
+	//Builds All of the Recipes from the Array
 	function renderRecipes() {
 		const recipeGrid = document.querySelector(`#recipe-grid`);
 		const cardHTML = recipeBook.recipes
@@ -237,5 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// 5. EVENT LISTENERS
 	//    document.getElementById('recipe-form').addEventListener('submit', ...);
-	//    document.getElementById('search-input').addEventListener('input', ...);
+
+	//Search Logic to Find Recipes by Tags or Ingredients
+	document.getElementById('search-input').addEventListener('input', () => {});
 });

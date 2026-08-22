@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// 2. recipeBook
 	const recipeBook = {
+		//Recipes Array [Array of Objects]
 		recipes: [
 			{
 				id: crypto.randomUUID(),
@@ -44,22 +45,46 @@ document.addEventListener('DOMContentLoaded', () => {
 				ingredients: ['pasta', 'garlic', 'butter', 'parmesan'],
 				tags: new Set(['quick', 'vegetarian']),
 				prepTime: 40
+			},
+
+			{
+				id: crypto.randomUUID(),
+				name: 'Shakshuka',
+				ingredients: [
+					'eggs',
+					'tomatoes',
+					'onion',
+					'garlic',
+					'olive oil',
+					'basil',
+					'black pepper'
+				],
+				tags: new Set(['breakfast', 'spicy', 'vegetarian']),
+				prepTime: 25
 			}
 		],
+
+		//Adding Recipes
 		add(recipe) {
 			if (!recipe.id) {
 				recipe.id = crypto.randomUUID();
-				console.log(recipe.id);
+				console.log(recipe);
 			}
 			this.recipes = [...this.recipes, recipe];
 			return recipe;
 		},
+
+		//Removing Recipe
 		remove(id) {
-			const originalLength = this.recipes.length;
-			this.recipes = this.recipes.filter((recipe) => recipe.id != id);
-			return originalLength > this.recipes.length;
+			return this.recipes.filter((recipe) => recipe.id != id);
 		},
-		findByIngredient(ingredient) {}
+
+		//Finding Recipe
+		findByIngredient(ingredient) {
+			return this.recipes.filter((recipe) => {
+				return recipe.ingredients.includes(ingredient);
+			});
+		}
 	};
 
 	// 3. RENDER FUNCTIONS
@@ -77,7 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	//TESTS
 
-	console.log(recipeBook);
 	recipeBook.add({
 		name: 'Test',
 		ingredients: [],
@@ -85,7 +109,5 @@ document.addEventListener('DOMContentLoaded', () => {
 		prepTime: 5
 	});
 
-	// const realId = recipeBook.recipes[0].id;
-	// console.log(recipeBook.remove(realId));
-	// console.log(recipeBook.recipes);
+	console.log(recipeBook.findByIngredient('garlic'));
 });

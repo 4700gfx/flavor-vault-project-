@@ -224,9 +224,9 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	//Builds All of the Recipes from the Array
-	function renderRecipes() {
+	function renderRecipes(recipesToRender = recipeBook.recipes) {
 		const recipeGrid = document.querySelector(`#recipe-grid`);
-		const cardHTML = recipeBook.recipes
+		const cardHTML = recipesToRender
 			.map((recipe) => buildRecipeCard(recipe))
 			.join('');
 		recipeGrid.innerHTML = cardHTML;
@@ -240,10 +240,36 @@ document.addEventListener('DOMContentLoaded', () => {
 	// 4. HELPERS
 	//    function parseCommaList(input) { ... }
 	//    function canMake(recipe, pantry) { ... }
+	function matchesSearch(recipe, searchTerm) {
+		const term = searchTerm.toLowerCase();
+		const ingredientMatch = recipe.ingredients.some((ing) =>
+			ing.toLowerCase().includes(term)
+		);
+
+		const tagArr = [...recipe.tags];
+
+		const tagMatch = tagArr.some((ing) => ing.toLowerCase().includes(term));
+		return ingredientMatch || tagMatch;
+	}
 
 	// 5. EVENT LISTENERS
 	//    document.getElementById('recipe-form').addEventListener('submit', ...);
 
 	//Search Logic to Find Recipes by Tags or Ingredients
-	document.getElementById('search-input').addEventListener('input', () => {});
+	document.querySelector('#search-input').addEventListener('input', (event) => {
+		//Targeting the Value within the Input
+		const searchTerm = event.target.value;
+
+		//Gaurd Clause for an Empty Input
+		if (searchTerm === '') {
+			renderRecipes();
+			return;
+		}
+
+		//Filters through the Recipe based on the Recipe and the Term
+		const filtered = recipeBook.recipes.filter((recipe) =>
+			matchesSearch(recipe, searchTerm.toLowerCase())
+		);
+		renderRecipes(filtered);
+	});
 });

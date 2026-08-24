@@ -226,6 +226,15 @@ document.addEventListener('DOMContentLoaded', () => {
 	//Builds All of the Recipes from the Array
 	function renderRecipes(recipesToRender = recipeBook.recipes) {
 		const recipeGrid = document.querySelector(`#recipe-grid`);
+		const emptyState = document.querySelector(`#recipe-empty-state`);
+
+		if (recipesToRender.length === 0) {
+			emptyState.hidden = false;
+			recipeGrid.innerHTML = ``;
+			return;
+		}
+
+		emptyState.hidden = true;
 		const cardHTML = recipesToRender
 			.map((recipe) => buildRecipeCard(recipe))
 			.join('');

@@ -33,7 +33,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// 1. STATE
 
-	const pantry = new Set([]);
+	const pantry = new Set([
+		`Garlic`,
+		`Pasta`,
+		`Butter`,
+		'Parmesan',
+		'Tomato',
+		'Onion',
+		'Bacon',
+		'Bread',
+		`Lettuce`
+	]);
 
 	// 2. RECIPE BOOK OBJECT WITH METHODS
 
@@ -60,6 +70,14 @@ document.addEventListener('DOMContentLoaded', () => {
 					'basil',
 					'black pepper'
 				],
+				tags: new Set(['breakfast', 'spicy', 'vegetarian']),
+				prepTime: 25
+			},
+
+			{
+				id: crypto.randomUUID(),
+				name: 'BLT Sandwich',
+				ingredients: ['tomatoes', 'bacon', 'lettuce', 'bread'],
 				tags: new Set(['breakfast', 'spicy', 'vegetarian']),
 				prepTime: 25
 			}
@@ -247,8 +265,23 @@ document.addEventListener('DOMContentLoaded', () => {
 	//  function renderPantrySidebar() {}
 
 	// 4. HELPERS
-	//    function parseCommaList(input) { ... }
-	//    function canMake(recipe, pantry) { ... }
+	function parseCommaList(input) {}
+
+	function canMake(recipe, pantry) {
+		const lowercasePantry = new Set(
+			[...pantry].map((item) => item.toLowerCase())
+		);
+		console.log(lowercasePantry);
+
+		return recipe.ingredients.every((ing) =>
+			lowercasePantry.has(ing.toLowerCase())
+		);
+	}
+
+	console.log(canMake(recipeBook.recipes[0], pantry)); // Garlic Butter Pasta — pantry has garlic, pasta, butter, parmesan — expect true
+	console.log(canMake(recipeBook.recipes[1], pantry)); // Shakshuka — pantry is missing eggs, olive oil, basil, black pepper — expect false
+	console.log(canMake(recipeBook.recipes[2], pantry)); // BLT Sandwich — pantry has tomato, bacon, lettuce, bread — expect true
+
 	function matchesSearch(recipe, searchTerm) {
 		//Turning Input into Lower Case to Compare
 		const term = searchTerm.toLowerCase();

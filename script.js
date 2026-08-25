@@ -250,15 +250,19 @@ document.addEventListener('DOMContentLoaded', () => {
 	//    function parseCommaList(input) { ... }
 	//    function canMake(recipe, pantry) { ... }
 	function matchesSearch(recipe, searchTerm) {
+		//Turning Input into Lower Case to Compare
 		const term = searchTerm.toLowerCase();
+
+		//Different Matching Algorithms
 		const ingredientMatch = recipe.ingredients.some((ing) =>
 			ing.toLowerCase().includes(term)
 		);
-
 		const tagArr = [...recipe.tags];
-
 		const tagMatch = tagArr.some((ing) => ing.toLowerCase().includes(term));
-		return ingredientMatch || tagMatch;
+		const nameMatch = recipe.name.toLowerCase().includes(term);
+
+		//Short Circuit based on Which Match
+		return ingredientMatch || tagMatch || nameMatch;
 	}
 
 	// 5. EVENT LISTENERS

@@ -283,10 +283,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		);
 	}
 
-	console.log(canMake(recipeBook.recipes[0], pantry)); // Garlic Butter Pasta — pantry has garlic, pasta, butter, parmesan — expect true
-	console.log(canMake(recipeBook.recipes[1], pantry)); // Shakshuka — pantry is missing eggs, olive oil, basil, black pepper — expect false
-	console.log(canMake(recipeBook.recipes[2], pantry)); // BLT Sandwich — pantry has tomato, bacon, lettuce, bread — expect true
-
 	function matchesSearch(recipe, searchTerm) {
 		//Turning Input into Lower Case to Compare
 		const term = searchTerm.toLowerCase();
@@ -302,6 +298,18 @@ document.addEventListener('DOMContentLoaded', () => {
 		//Short Circuit based on Which Match
 		return ingredientMatch || tagMatch || nameMatch;
 	}
+
+	function getMissingIngredients(recipe, pantry) {
+		const lowercasePantry = new Set(
+			[...pantry].map((item) => item.toLowerCase())
+		);
+
+		return recipe.ingredients.filter(
+			(ingredient) => !lowercasePantry.has(ingredient.toLowerCase())
+		);
+	}
+
+	console.log(getMissingIngredients(recipeBook.recipes[1], pantry));
 
 	// 5. EVENT LISTENERS
 	//    document.getElementById('recipe-form').addEventListener('submit', ...);

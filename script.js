@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		`Pasta`,
 		`Butter`,
 		'Parmesan',
-		'Tomato',
+		'Tomatoes',
 		'Onion',
 		'Bacon',
 		'Bread',
@@ -112,7 +112,12 @@ document.addEventListener('DOMContentLoaded', () => {
 	// 3. RENDER FUNCTIONS
 
 	//Builds Single Recipe Cards
-	function buildRecipeCard({ id, name, ingredients, tags, prepTime }) {
+	function buildRecipeCard(recipe, pantry) {
+		const { id, name, ingredients, tags, prepTime } = recipe;
+		const ready = canMake(recipe, pantry);
+		const borderClass = ready ? 'border-accent' : 'border-transparent';
+		const statusValue = ready ? 'ready' : 'missing';
+
 		//Adds Tag Span with Style Options
 		const tagsHTML = [...tags]
 			.map((tag) => {
@@ -125,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			.join('');
 
 		//Recipe Card HTML
-		const recipeCard = `<article class="recipe-card bg-neutral-200 rounded-2xl p-3 flex flex-col gap-2 border-t-[3px] border-accent" data-recipe-id="${id}">
+		const recipeCard = `<article class="recipe-card bg-neutral-200 rounded-2xl p-3 flex flex-col gap-2 border-t-[3px] ${borderClass}" data-recipe-id="${id}">
 								<div class="flex gap-3 items-center mb-1">
 									<div
 										class="w-[42px] h-[42px] rounded-xl bg-accent-100 flex items-center justify-center shrink-0">
@@ -192,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
 								</div>
 								<div
 									class="recipe-card-status flex items-center gap-1.5 text-xs text-accent-700 font-semibold"
-									data-status="ready"
+									data-status="${statusValue}"
 								>
 									<svg
 										width="13"
@@ -254,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		emptyState.hidden = true;
 		const cardHTML = recipesToRender
-			.map((recipe) => buildRecipeCard(recipe))
+			.map((recipe) => buildRecipeCard(recipe, pantry))
 			.join('');
 		recipeGrid.innerHTML = cardHTML;
 	}

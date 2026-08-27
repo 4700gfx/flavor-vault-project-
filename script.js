@@ -80,6 +80,14 @@ document.addEventListener('DOMContentLoaded', () => {
 				ingredients: ['tomatoes', 'bacon', 'lettuce', 'bread'],
 				tags: new Set(['breakfast', 'spicy', 'vegetarian']),
 				prepTime: 25
+			},
+
+			{
+				id: crypto.randomUUID(),
+				name: 'Steak and Sweet Potatoes Bowl',
+				ingredients: ['steak', 'sweet potatoes', 'olive oil'],
+				tags: new Set(['dinner', 'spicy', 'healthy']),
+				prepTime: 30
 			}
 		],
 
@@ -117,6 +125,16 @@ document.addEventListener('DOMContentLoaded', () => {
 		const ready = canMake(recipe, pantry);
 		const borderClass = ready ? 'border-accent' : 'border-transparent';
 		const statusValue = ready ? 'ready' : 'missing';
+
+		const missing = getMissingIngredients(recipe, pantry);
+		const statusHTML = ready
+			? `<div class="recipe-card-status flex items-center gap-1.5 text-xs text-accent-700 font-semibold" data-status="ready">
+  		<svg ...><path d="M20 6 9 17l-5-5"></path></svg>
+ 			 Pantry ready — you have everything
+			</div>`
+			: `<div class="recipe-card-status text-xs text-neutral-600 font-semibold" data-status="missing">
+  				Missing ${missing.length} — <span class="text-accent-700">${missing.join(', ')}</span>
+				</div>`;
 
 		//Adds Tag Span with Style Options
 		const tagsHTML = [...tags]

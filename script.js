@@ -128,8 +128,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		const missing = getMissingIngredients(recipe, pantry);
 		const statusHTML = ready
-			? `<div class="recipe-card-status flex items-center gap-1.5 text-xs text-accent-700 font-semibold" data-status="ready">
-  		<svg ...><path d="M20 6 9 17l-5-5"></path></svg>
+			? `<div class="recipe-card-status flex items-center gap-1.5 text-xs text-accent-700 font-semibold" data-status="${statusValue}">
+									<svg
+										width="13"
+										height="13"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2.4"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M20 6 9 17l-5-5"></path>
+									</svg>
  			 Pantry ready — you have everything
 			</div>`
 			: `<div class="recipe-card-status text-xs text-neutral-600 font-semibold" data-status="missing">
@@ -213,24 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
 										</svg>
 									</button>
 								</div>
-								<div
-									class="recipe-card-status flex items-center gap-1.5 text-xs text-accent-700 font-semibold"
-									data-status="${statusValue}"
-								>
-									<svg
-										width="13"
-										height="13"
-										viewBox="0 0 24 24"
-										fill="none"
-										stroke="currentColor"
-										stroke-width="2.4"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-									>
-										<path d="M20 6 9 17l-5-5"></path>
-									</svg>
-									Pantry ready — you have everything
-								</div>
+									${statusHTML}
 								<div
 									class="recipe-card-ingredients text-[13px] text-neutral-700"
 								>

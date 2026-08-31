@@ -282,7 +282,17 @@ document.addEventListener('DOMContentLoaded', () => {
 	//  function renderPantrySidebar() {}
 
 	// 4. HELPERS
-	function parseCommaList(input) {}
+	function parseCommaList(input) {
+		//Takes List and Turns into an Array
+		//Input: String, Output: Array
+
+		return input
+			.split(',')
+			.map((ing) => ing.trim())
+			.filter((ing) => Boolean(ing) === true);
+	}
+
+	parseCommaList('nuts, cherry, berries .');
 
 	function canMake(recipe, pantry) {
 		const lowercasePantry = new Set(
@@ -319,8 +329,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			(ingredient) => !lowercasePantry.has(ingredient.toLowerCase())
 		);
 	}
-
-	console.log(getMissingIngredients(recipeBook.recipes[1], pantry));
 
 	// 5. EVENT LISTENERS
 	//    document.getElementById('recipe-form').addEventListener('submit', ...);

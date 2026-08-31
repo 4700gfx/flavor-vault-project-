@@ -14,6 +14,10 @@
 //   5. EVENT LISTENERS   — wired last, after everything above
 // ============================================================
 
+//Elements and Global Variables
+const recipeForm = document.getElementById('recipe-form');
+const searchInput = document.querySelector('#search-input');
+
 // --- Screen switcher (presentational — which .fv-screen is visible) ---
 function fvGo(screenName) {
 	document.querySelectorAll('.fv-screen').forEach((el) => {
@@ -97,6 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				recipe.id = crypto.randomUUID();
 			}
 			this.recipes = [...this.recipes, recipe];
+			console.log(recipeBook.recipes);
 			return recipe;
 		},
 
@@ -292,8 +297,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			.filter((ing) => Boolean(ing) === true);
 	}
 
-	parseCommaList('nuts, cherry, berries .');
-
 	function canMake(recipe, pantry) {
 		const lowercasePantry = new Set(
 			[...pantry].map((item) => item.toLowerCase())
@@ -330,11 +333,44 @@ document.addEventListener('DOMContentLoaded', () => {
 		);
 	}
 
+	//Elements for Form to Read
+	const inputRecipeName = document.querySelector(`#recipe-name-input`);
+	const inputIngredients = document.querySelector(`#recipe-ingredients-input`);
+	const inputPrepTime = document.querySelector(`#recipe-preptime-input`);
+	const inputRecipeTags = document.querySelector(`#recipe-tags-input`);
+
 	// 5. EVENT LISTENERS
-	//    document.getElementById('recipe-form').addEventListener('submit', ...);
+	recipeForm.addEventListener('submit', (event) => {
+		event.preventDefault();
+
+		const recipeName = inputRecipeName.value;
+		const ingredientsList = inputIngredients.value;
+		const recipePrepTime = Number(inputPrepTime.value);
+		const recipeTags = inputRecipeTags.value;
+
+		const ingredientArr = parseCommaList(ingredientsList);
+		const tagsSet = new Set(parseCommaList(recipeTags));
+
+		console.log(`Here are the Ingredients`, ingredientArr);
+		console.log(
+			`The Prep Time is going to take about ${recipePrepTime} mintues`
+		);
+
+		const newRecipe = {
+			name: recipeName.trim(),
+			ingredients: ingredientArr,
+			tags: tagsSet,
+			prepTime: recipePrepTime
+		};
+
+		console.log(`Your Recipe has been added:`, newRecipe);
+		recipeBook.add(newRecipe);
+		renderRecipes();
+		recipeForm.reset();
+	});
 
 	//Search Logic to Find Recipes by Tags or Ingredients
-	document.querySelector('#search-input').addEventListener('input', (event) => {
+	searchInput.addEventListener('input', (event) => {
 		//Targeting the Value within the Input
 		const searchTerm = event.target.value;
 

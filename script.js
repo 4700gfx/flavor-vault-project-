@@ -14,10 +14,6 @@
 //   5. EVENT LISTENERS   — wired last, after everything above
 // ============================================================
 
-//Elements and Global Variables
-const recipeForm = document.getElementById('recipe-form');
-const searchInput = document.querySelector('#search-input');
-
 // --- Screen switcher (presentational — which .fv-screen is visible) ---
 function fvGo(screenName) {
 	document.querySelectorAll('.fv-screen').forEach((el) => {
@@ -338,6 +334,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	const inputIngredients = document.querySelector(`#recipe-ingredients-input`);
 	const inputPrepTime = document.querySelector(`#recipe-preptime-input`);
 	const inputRecipeTags = document.querySelector(`#recipe-tags-input`);
+	const recipeForm = document.getElementById('recipe-form');
+	const searchInput = document.querySelector('#search-input');
 
 	// 5. EVENT LISTENERS
 	recipeForm.addEventListener('submit', (event) => {

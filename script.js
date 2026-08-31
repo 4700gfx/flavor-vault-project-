@@ -288,7 +288,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		const lowercasePantry = new Set(
 			[...pantry].map((item) => item.toLowerCase())
 		);
-		console.log(lowercasePantry);
 
 		return recipe.ingredients.every((ing) =>
 			lowercasePantry.has(ing.toLowerCase())

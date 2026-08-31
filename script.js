@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// 1. STATE
 
+	//Pantry as a Set to Remove Duplicate Items
 	const pantry = new Set([
 		`Garlic`,
 		`Pasta`,
@@ -42,7 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		'Onion',
 		'Bacon',
 		'Bread',
-		`Lettuce`
+		'Lettuce',
+		'Steak'
 	]);
 
 	// 2. RECIPE BOOK OBJECT WITH METHODS
@@ -91,13 +93,17 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 		],
 
+		//OBJECT FUNCTIONS TO ADD, REMOVE AND DELETE RECIPES
+
 		//Adding Recipes
 		add(recipe) {
+			//Guard Clause for if Recipe Does Not Have ID
 			if (!recipe.id) {
 				recipe.id = crypto.randomUUID();
 			}
+
+			//Adds to Recipe Book Recipes
 			this.recipes = [...this.recipes, recipe];
-			console.log(recipeBook.recipes);
 			return recipe;
 		},
 
@@ -122,7 +128,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	//Builds Single Recipe Cards
 	function buildRecipeCard(recipe, pantry) {
+		//Destructing Variables to Use within HTML
 		const { id, name, ingredients, tags, prepTime } = recipe;
+
+		//Variables based on Ternary Values
 		const ready = canMake(recipe, pantry);
 		const borderClass = ready ? 'border-accent' : 'border-transparent';
 		const statusValue = ready ? 'ready' : 'missing';
@@ -264,12 +273,14 @@ document.addEventListener('DOMContentLoaded', () => {
 		const recipeGrid = document.querySelector(`#recipe-grid`);
 		const emptyState = document.querySelector(`#recipe-empty-state`);
 
+		//Guard Clause for If No Recipes are to Be Rendered
 		if (recipesToRender.length === 0) {
 			emptyState.hidden = false;
 			recipeGrid.innerHTML = ``;
 			return;
 		}
 
+		//Rendering Recipes
 		emptyState.hidden = true;
 		const cardHTML = recipesToRender
 			.map((recipe) => buildRecipeCard(recipe, pantry))
@@ -294,10 +305,12 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	function canMake(recipe, pantry) {
+		//Lower Case Items to Compare
 		const lowercasePantry = new Set(
 			[...pantry].map((item) => item.toLowerCase())
 		);
 
+		//Compares Ingredients Aganist Items in Pantry
 		return recipe.ingredients.every((ing) =>
 			lowercasePantry.has(ing.toLowerCase())
 		);

@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				recipe.id = crypto.randomUUID();
 			}
 
-			//Adds to Recipe Book Recipes
+			//Adds to Recipe Book Recipes through Spreading
 			this.recipes = [...this.recipes, recipe];
 			return recipe;
 		},
@@ -111,11 +111,13 @@ document.addEventListener('DOMContentLoaded', () => {
 		remove(id) {
 			const originalLength = this.recipes.length;
 			this.recipes = this.recipes.filter((recipe) => recipe.id !== id);
+			console.log(this.recipes);
 			return this.recipes.length < originalLength;
 		},
 
 		//Finding Recipe
 		findByIngredient(ingredient) {
+			//Referencing The Recipes Array in Recipe Book through using THIS
 			return this.recipes.filter((recipe) => {
 				return recipe.ingredients.some(
 					(ing) => ing.toLowerCase() === ingredient.toLowerCase()
@@ -349,24 +351,25 @@ document.addEventListener('DOMContentLoaded', () => {
 	const inputRecipeTags = document.querySelector(`#recipe-tags-input`);
 	const recipeForm = document.getElementById('recipe-form');
 	const searchInput = document.querySelector('#search-input');
+	const recipeGrid = document.querySelector('#recipe-grid');
 
 	// 5. EVENT LISTENERS
+
+	//Recipe Form Submission
 	recipeForm.addEventListener('submit', (event) => {
 		event.preventDefault();
 
+		//Retriving Form Values
 		const recipeName = inputRecipeName.value;
 		const ingredientsList = inputIngredients.value;
 		const recipePrepTime = Number(inputPrepTime.value);
 		const recipeTags = inputRecipeTags.value;
 
+		//Getting Arrays and Sets from Helper Function
 		const ingredientArr = parseCommaList(ingredientsList);
 		const tagsSet = new Set(parseCommaList(recipeTags));
 
-		console.log(`Here are the Ingredients`, ingredientArr);
-		console.log(
-			`The Prep Time is going to take about ${recipePrepTime} mintues`
-		);
-
+		//Adding New Object from Values
 		const newRecipe = {
 			name: recipeName.trim(),
 			ingredients: ingredientArr,
@@ -378,6 +381,20 @@ document.addEventListener('DOMContentLoaded', () => {
 		recipeBook.add(newRecipe);
 		renderRecipes();
 		recipeForm.reset();
+	});
+
+	//Recipe Grid Deletion
+	recipeGrid.addEventListener('click', (event) => {
+		const deleteButton = event.target.closest('.delete-recipe-btn');
+
+		if (!deleteButton) {
+			return;
+		} else {
+			const recipeId = deleteButton.dataset.recipeId;
+			console.log(recipeId);
+			recipeBook.remove(recipeId);
+			renderRecipes();
+		}
 	});
 
 	//Search Logic to Find Recipes by Tags or Ingredients

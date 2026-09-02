@@ -35,16 +35,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	//Pantry as a Set to Remove Duplicate Items
 	const pantry = new Set([
-		`Garlic`,
-		`Pasta`,
-		`Butter`,
-		'Parmesan',
-		'Tomatoes',
-		'Onion',
-		'Bacon',
-		'Bread',
-		'Lettuce',
-		'Steak'
+		`garlic`,
+		`pasta`,
+		`butter`,
+		'parmesan',
+		'tomatoes',
+		'onion',
+		'bacon',
+		'bread',
+		'lettuce',
+		'steak'
 	]);
 
 	// 2. RECIPE BOOK OBJECT WITH METHODS
@@ -293,7 +293,33 @@ document.addEventListener('DOMContentLoaded', () => {
 	renderRecipes();
 
 	//  function renderTagCloud() {}
-	//  function renderPantrySidebar() {}
+
+	function renderPantryList() {
+		const pantryList = document.querySelector('#pantry-list');
+		const lowercasePantry = [...pantry].map((item) => item.toLowerCase());
+		const pantryPill = lowercasePantry
+			.map(
+				(ingredient) =>
+					`<span
+				class='pantry-item-tag tag-pill rounded-full px-2.5 py-0.5 bg-neutral-100 text-neutral-800'
+				data-ingredient='${ingredient}'
+			>
+				${ingredient}
+				<button
+					type='button'
+					class='remove-pantry-item'
+					data-ingredient='${ingredient}'
+				>
+					×
+				</button>
+			</span>`
+			)
+			.join('');
+
+		pantryList.innerHTML = pantryPill;
+	}
+
+	renderPantryList();
 
 	// 4. HELPERS
 	function parseCommaList(input) {
@@ -413,5 +439,41 @@ document.addEventListener('DOMContentLoaded', () => {
 			matchesSearch(recipe, searchTerm.toLowerCase())
 		);
 		renderRecipes(filtered);
+	});
+
+	const addPantryButton = document.querySelector(`#pantry-add-btn`);
+	const pantryInput = document.querySelector(`#pantry-add-input`);
+	const pantryList = document.querySelector('#pantry-list');
+
+	addPantryButton.addEventListener('click', (event) => {
+		event.preventDefault();
+		const pantryIngredient = pantryInput.value.toLowerCase().trim();
+		console.log(pantryIngredient);
+
+		if (!pantryIngredient) {
+			return;
+		}
+
+		pantry.add(pantryIngredient);
+		console.log(`${pantryIngredient} has been added to the Pantry`);
+		console.log(pantry);
+		renderPantryList();
+		renderRecipes();
+		pantryInput.value = '';
+	});
+
+	pantryList.addEventListener('click', (event) => {
+		const deleteButton = event.target.closest('.remove-pantry-item');
+
+		if (!deleteButton) {
+			return;
+		} else {
+			const ingredient = deleteButton.dataset.ingredient;
+			console.log(ingredient);
+			pantry.delete(ingredient);
+			console.log(pantry);
+			renderPantryList();
+			renderRecipes();
+		}
 	});
 });

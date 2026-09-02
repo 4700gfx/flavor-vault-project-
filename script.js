@@ -441,10 +441,12 @@ document.addEventListener('DOMContentLoaded', () => {
 		renderRecipes(filtered);
 	});
 
+	//Variables for Pantry Event Listeners
 	const addPantryButton = document.querySelector(`#pantry-add-btn`);
 	const pantryInput = document.querySelector(`#pantry-add-input`);
 	const pantryList = document.querySelector('#pantry-list');
 
+	//Adding an Ingredient
 	addPantryButton.addEventListener('click', (event) => {
 		event.preventDefault();
 		const pantryIngredient = pantryInput.value.toLowerCase().trim();
@@ -462,6 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		pantryInput.value = '';
 	});
 
+	//Removing an Ingredient
 	pantryList.addEventListener('click', (event) => {
 		const deleteButton = event.target.closest('.remove-pantry-item');
 

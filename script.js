@@ -292,7 +292,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	renderRecipes();
 
-	//  function renderTagCloud() {}
+	//Using Map to Keep Count of Tags and Create Tag Cloud
+	function renderTagCloud() {
+		//Set Up Map for Count
+		const tagCount = new Map();
+
+		//Iterate Over Recipes to Find Each Tag
+		recipeBook.recipes.forEach((recipe, index) =>
+			tagCount.set(index + 1, [...recipe.tags])
+		);
+
+		//Render All Cloud Tags
+
+		console.log(tagCount);
+	}
+
+	renderTagCloud();
 
 	function renderPantryList() {
 		const pantryList = document.querySelector('#pantry-list');
